@@ -1,21 +1,20 @@
 get_filename_component(ProjectId ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
-if ( USE_OMP )
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=[sanitizer_name] [additional_options] [-g] [-OX]")
-    set(ProjectId "${ProjectId}_omp")
+if ( USE_STD )
+    set(ProjectId "${ProjectId}_std")
     project( ${ProjectId} )
     message( STATUS "-- " ${ProjectId} )
-
 
     file(GLOB_RECURSE ALL_SOURCE_FILES *.cpp *.h)
 
     set(PACK_LIB "${ProjectId}_lib")
-    add_library(${PACK_LIB} STATIC ${ALL_SOURCE_FILES} Disjoint_Set_Union.h)
+    add_library(${PACK_LIB} STATIC ${ALL_SOURCE_FILES} )
 
     add_executable( ${ProjectId} ${ALL_SOURCE_FILES} )
 
     target_link_libraries(${ProjectId} ${PACK_LIB})
     target_link_libraries(${ProjectId} gtest gtest_main)
+    target_link_libraries (${ProjectId} Threads::Threads)
 
     enable_testing()
     add_test(NAME ${ProjectId} COMMAND ${ProjectId})
@@ -53,7 +52,7 @@ if ( USE_OMP )
             ${CMAKE_SOURCE_DIR}/scripts/check_count_tests.py
             ${ProjectId}
             ${ARGS_FOR_CHECK_COUNT_TESTS}
-            )
-else( USE_OMP )
+    )
+else( USE_STD )
     message( STATUS "-- ${ProjectId} - NOT BUILD!"  )
-endif( USE_OMP )
+endif( USE_STD )
